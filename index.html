@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
+    <title>White Label Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js?59"></script>
     <style>
         * {
@@ -16,110 +16,299 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #000000);
-            padding: 20px;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* Сайдбар */
+        .sidebar {
+            width: 280px;
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-right: 1px solid var(--tg-theme-section-separator-color, #e0e0e0);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
         }
 
-        .container {
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            color: var(--tg-theme-text-color, #000000);
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-
-        .info-card {
-            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
-            border-radius: 12px;
+        .sidebar-header {
             padding: 20px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e0e0e0);
         }
 
-        .info-item {
-            margin-bottom: 10px;
-            text-align: left;
-        }
-
-        .info-label {
-            color: var(--tg-theme-hint-color, #999999);
-            font-size: 14px;
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
             margin-bottom: 4px;
         }
 
-        .info-value {
-            color: var(--tg-theme-text-color, #000000);
-            font-size: 16px;
-            font-weight: 500;
+        .sidebar-subtitle {
+            font-size: 14px;
+            color: var(--tg-theme-hint-color, #999999);
         }
 
-        .button {
+        .sidebar-menu {
+            flex: 1;
+            padding: 12px;
+        }
+
+        .menu-item {
+            padding: 14px 16px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            color: var(--tg-theme-text-color, #000000);
+            text-decoration: none;
+        }
+
+        .menu-item:hover {
+            background-color: var(--tg-theme-section-bg-color, #f5f5f5);
+        }
+
+        .menu-item.active {
             background-color: var(--tg-theme-button-color, #3390ec);
             color: var(--tg-theme-button-text-color, #ffffff);
-            border: none;
-            border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 16px;
+        }
+
+        .menu-item-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .menu-item-text {
+            font-size: 15px;
             font-weight: 500;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: opacity 0.2s;
         }
 
-        .button:hover {
-            opacity: 0.9;
+        /* Основной контент */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .button:active {
-            opacity: 0.8;
+        .content-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--tg-theme-section-separator-color, #e0e0e0);
+            background-color: var(--tg-theme-bg-color, #ffffff);
         }
 
-        .status {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: var(--tg-theme-section-bg-color, #f5f5f5);
-            border-radius: 8px;
+        .content-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+        }
+
+        .content-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Страница вишлиста */
+        .wishlist-page {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .wishlist-item {
+            background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .wishlist-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--tg-theme-text-color, #000000);
+            margin-bottom: 8px;
+        }
+
+        .wishlist-item-description {
             font-size: 14px;
-            color: var(--tg-theme-subtitle-text-color, #666666);
+            color: var(--tg-theme-hint-color, #999999);
+            margin-bottom: 12px;
+        }
+
+        .wishlist-item-link {
+            color: var(--tg-theme-link-color, #3390ec);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* Iframe для встроенного сервиса */
+        .embedded-service {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .iframe-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--tg-theme-hint-color, #999999);
+            font-size: 14px;
+        }
+
+        /* Мобильная версия */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                transform: translateX(-100%);
+                box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .menu-toggle {
+                display: block;
+                position: fixed;
+                top: 16px;
+                left: 16px;
+                z-index: 999;
+                background-color: var(--tg-theme-button-color, #3390ec);
+                color: var(--tg-theme-button-text-color, #ffffff);
+                border: none;
+                border-radius: 8px;
+                padding: 10px 14px;
+                font-size: 18px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .sidebar-overlay.open {
+                display: block;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--tg-theme-hint-color, #999999);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>👋 Привет из Mini App!</h1>
-        
-        <div class="info-card">
-            <div class="info-item">
-                <div class="info-label">Платформа</div>
-                <div class="info-value" id="platform">-</div>
+    <!-- Кнопка меню для мобильных -->
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Сайдбар -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Меню</div>
+            <div class="sidebar-subtitle">Выберите раздел</div>
+        </div>
+        <div class="sidebar-menu">
+            <a href="#" class="menu-item active" data-page="wishlist" onclick="navigateTo('wishlist', event)">
+                <span class="menu-item-icon">🎁</span>
+                <span class="menu-item-text">Вишлист</span>
+            </a>
+            <a href="#" class="menu-item" data-page="gift-helper" onclick="navigateTo('gift-helper', event)">
+                <span class="menu-item-icon">🤖</span>
+                <span class="menu-item-text">ИИ помощник в подарках</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1 class="content-title" id="page-title">Вишлист</h1>
+        </div>
+        <div class="content-body" id="content-body">
+            <!-- Страница вишлиста -->
+            <div class="wishlist-page" id="wishlist-page">
+                <div class="wishlist-item">
+                    <div class="wishlist-item-title">Пример подарка 1</div>
+                    <div class="wishlist-item-description">Описание подарка и почему он нужен</div>
+                    <a href="#" class="wishlist-item-link">Ссылка на подарок →</a>
+                </div>
+                <div class="wishlist-item">
+                    <div class="wishlist-item-title">Пример подарка 2</div>
+                    <div class="wishlist-item-description">Еще один пример подарка из вишлиста</div>
+                    <a href="#" class="wishlist-item-link">Ссылка на подарок →</a>
+                </div>
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-text">Добавьте подарки в ваш вишлист</div>
+                </div>
             </div>
-            <div class="info-item">
-                <div class="info-label">Версия</div>
-                <div class="info-value" id="version">-</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Тема</div>
-                <div class="info-value" id="theme">-</div>
-            </div>
-            <div class="info-item" id="user-info" style="display: none;">
-                <div class="info-label">Пользователь</div>
-                <div class="info-value" id="username">-</div>
+
+            <!-- Страница ИИ помощника (скрыта по умолчанию) -->
+            <div class="iframe-container" id="gift-helper-page" style="display: none;">
+                <div class="iframe-loading">Загрузка ИИ помощника...</div>
+                <iframe 
+                    class="embedded-service" 
+                    id="gift-helper-iframe"
+                    src="https://quetlink-five.vercel.app/"
+                    allow="camera; microphone; geolocation"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                    loading="lazy"
+                ></iframe>
             </div>
         </div>
-
-        <button class="button" onclick="showAlert()">Показать алерт</button>
-        <button class="button" onclick="toggleMainButton()">Переключить главную кнопку</button>
-
-        <div class="status" id="status">Готов к работе!</div>
-    </div>
+    </main>
 
     <script>
         // Инициализация Telegram Web App
@@ -131,64 +320,120 @@
         // Говорим Telegram, что приложение готово
         tg.ready();
 
-        // Заполняем информацию
-        document.getElementById('platform').textContent = tg.platform || 'Неизвестно';
-        document.getElementById('version').textContent = tg.version || 'Неизвестно';
-        document.getElementById('theme').textContent = tg.colorScheme === 'dark' ? 'Темная' : 'Светлая';
+        // Устанавливаем цвета заголовка и фона
+        tg.setHeaderColor('bg_color');
+        tg.setBackgroundColor('bg_color');
 
-        // Показываем информацию о пользователе, если доступна
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('user-info').style.display = 'block';
-            document.getElementById('username').textContent = user.first_name || 'Пользователь';
-            if (user.username) {
-                document.getElementById('username').textContent += ` (@${user.username})`;
+        // Текущая страница
+        let currentPage = 'wishlist';
+
+        // Навигация между страницами
+        function navigateTo(page, event) {
+            if (event) {
+                event.preventDefault();
             }
-        }
 
-        // Настройка главной кнопки
-        tg.MainButton.setText('Главная кнопка');
-        tg.MainButton.show();
-        tg.MainButton.onClick(() => {
-            tg.showAlert('Вы нажали на главную кнопку!');
-        });
+            // Обновляем активный пункт меню
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
 
-        // Функция показа алерта
-        function showAlert() {
-            tg.showAlert('Это простой Telegram Mini App! 🎉');
-        }
+            // Скрываем все страницы
+            document.getElementById('wishlist-page').style.display = 'none';
+            document.getElementById('gift-helper-page').style.display = 'none';
 
-        // Функция переключения главной кнопки
-        let mainButtonVisible = true;
-        function toggleMainButton() {
-            if (mainButtonVisible) {
+            // Показываем выбранную страницу
+            if (page === 'wishlist') {
+                document.getElementById('wishlist-page').style.display = 'block';
+                document.getElementById('page-title').textContent = 'Вишлист';
+                currentPage = 'wishlist';
                 tg.MainButton.hide();
-                mainButtonVisible = false;
-                updateStatus('Главная кнопка скрыта');
-            } else {
-                tg.MainButton.show();
-                mainButtonVisible = true;
-                updateStatus('Главная кнопка показана');
+            } else if (page === 'gift-helper') {
+                document.getElementById('gift-helper-page').style.display = 'block';
+                document.getElementById('page-title').textContent = 'ИИ помощник в подарках';
+                currentPage = 'gift-helper';
+                
+                // Загружаем iframe, если еще не загружен
+                const iframe = document.getElementById('gift-helper-iframe');
+                const loading = iframe.parentElement.querySelector('.iframe-loading');
+                
+                iframe.onload = () => {
+                    if (loading) {
+                        loading.style.display = 'none';
+                    }
+                };
+
+                // Скрываем главную кнопку для встроенного сервиса
+                tg.MainButton.hide();
             }
+
+            // Закрываем сайдбар на мобильных
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+
+            // Тактильная обратная связь
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        // Обновление статуса
-        function updateStatus(message) {
-            document.getElementById('status').textContent = message;
-            setTimeout(() => {
-                document.getElementById('status').textContent = 'Готов к работе!';
-            }, 2000);
+        // Переключение сайдбара на мобильных
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
         }
 
         // Обработка изменения темы
         tg.onEvent('themeChanged', () => {
-            document.getElementById('theme').textContent = tg.colorScheme === 'dark' ? 'Темная' : 'Светлая';
+            // Обновляем цвета при изменении темы
+            tg.setHeaderColor('bg_color');
+            tg.setBackgroundColor('bg_color');
         });
 
         // Обработка изменения размера viewport
         tg.onEvent('viewportChanged', (event) => {
-            if (event.isStateStable) {
-                updateStatus(`Высота: ${Math.round(tg.viewportHeight)}px`);
+            // Можно добавить логику адаптации под изменение размера
+        });
+
+        // Обработка кнопки "Назад"
+        tg.BackButton.onClick(() => {
+            if (currentPage !== 'wishlist') {
+                navigateTo('wishlist');
+                tg.BackButton.hide();
+            } else {
+                tg.close();
+            }
+        });
+
+        // Показываем кнопку "Назад" только если не на главной странице
+        if (currentPage !== 'wishlist') {
+            tg.BackButton.show();
+        }
+
+        // Обработка изменения ориентации на мобильных
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                sidebar.classList.remove('open');
+                overlay.classList.remove('open');
+            }
+        });
+
+        // Инициализация iframe после загрузки
+        window.addEventListener('load', () => {
+            const iframe = document.getElementById('gift-helper-iframe');
+            if (iframe) {
+                // Если iframe уже загружен, скрываем индикатор загрузки
+                setTimeout(() => {
+                    const loading = iframe.parentElement.querySelector('.iframe-loading');
+                    if (loading && iframe.contentDocument) {
+                        loading.style.display = 'none';
+                    }
+                }, 2000);
             }
         });
     </script>
