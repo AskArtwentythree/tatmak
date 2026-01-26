@@ -301,9 +301,8 @@
                 <iframe 
                     class="embedded-service" 
                     id="gift-helper-iframe"
-                    src="https://quetlink-five.vercel.app/"
                     allow="camera; microphone; geolocation"
-                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-top-navigation-by-user-activation"
                     loading="lazy"
                 ></iframe>
             </div>
@@ -326,6 +325,97 @@
 
         // Текущая страница
         let currentPage = 'wishlist';
+        let iframeLoaded = false;
+
+        // Функция для передачи параметров Telegram в iframe
+        function setupTelegramParamsForIframe(iframe) {
+            // Собираем все данные из Telegram Web App API
+            const telegramData = {
+                initData: tg.initData,
+                initDataUnsafe: tg.initDataUnsafe,
+                version: tg.version,
+                platform: tg.platform,
+                colorScheme: tg.colorScheme,
+                themeParams: tg.themeParams,
+                isExpanded: tg.isExpanded,
+                viewportHeight: tg.viewportHeight,
+                viewportStableHeight: tg.viewportStableHeight,
+                headerColor: tg.headerColor,
+                backgroundColor: tg.backgroundColor,
+                isClosingConfirmationEnabled: tg.isClosingConfirmationEnabled,
+                BackButton: {
+                    isVisible: tg.BackButton.isVisible
+                },
+                MainButton: {
+                    text: tg.MainButton.text,
+                    color: tg.MainButton.color,
+                    textColor: tg.MainButton.textColor,
+                    isVisible: tg.MainButton.isVisible,
+                    isActive: tg.MainButton.isActive,
+                    isProgressVisible: tg.MainButton.isProgressVisible
+                },
+                HapticFeedback: {
+                    available: !!tg.HapticFeedback
+                }
+            };
+
+            // Функция отправки данных в iframe
+            const sendDataToIframe = () => {
+                try {
+                    if (iframe.contentWindow) {
+                        iframe.contentWindow.postMessage({
+                            type: 'TELEGRAM_WEB_APP_DATA',
+                            data: telegramData
+                        }, 'https://quetlink-five.vercel.app');
+                        console.log('[Parent] Sent Telegram data to iframe');
+                    }
+                } catch (e) {
+                    console.error('[Parent] Error sending Telegram data to iframe:', e);
+                }
+            };
+
+            // Передаем данные через postMessage после загрузки iframe
+            iframe.onload = () => {
+                console.log('[Parent] Iframe loaded, sending Telegram data...');
+                
+                // Небольшая задержка для гарантии, что iframe готов
+                setTimeout(() => {
+                    sendDataToIframe();
+                    
+                    const loading = iframe.parentElement.querySelector('.iframe-loading');
+                    if (loading) {
+                        setTimeout(() => {
+                            loading.style.display = 'none';
+                        }, 1000);
+                    }
+                }, 100);
+            };
+
+            // Также устанавливаем src с параметрами при первой загрузке
+            if (!iframeLoaded) {
+                const urlParams = new URLSearchParams();
+                if (tg.initData) {
+                    urlParams.set('tgWebAppData', encodeURIComponent(tg.initData));
+                }
+                if (tg.version) {
+                    urlParams.set('tgWebAppVersion', tg.version);
+                }
+                if (tg.platform) {
+                    urlParams.set('tgWebAppPlatform', tg.platform);
+                }
+                if (tg.colorScheme) {
+                    urlParams.set('tgWebAppColorScheme', tg.colorScheme);
+                }
+
+                const baseUrl = 'https://quetlink-five.vercel.app/';
+                iframe.src = baseUrl + (urlParams.toString() ? '?' + urlParams.toString() : '');
+                iframeLoaded = true;
+                console.log('[Parent] Set iframe src with URL params');
+            } else {
+                // Если iframe уже загружен, сразу отправляем данные
+                sendDataToIframe();
+            }
+        }
 
         // Навигация между страницами
         function navigateTo(page, event) {
@@ -349,23 +439,19 @@
                 document.getElementById('page-title').textContent = 'Вишлист';
                 currentPage = 'wishlist';
                 tg.MainButton.hide();
+                tg.BackButton.hide();
             } else if (page === 'gift-helper') {
                 document.getElementById('gift-helper-page').style.display = 'block';
                 document.getElementById('page-title').textContent = 'ИИ помощник в подарках';
                 currentPage = 'gift-helper';
                 
-                // Загружаем iframe, если еще не загружен
+                // Настраиваем iframe с параметрами Telegram
                 const iframe = document.getElementById('gift-helper-iframe');
-                const loading = iframe.parentElement.querySelector('.iframe-loading');
-                
-                iframe.onload = () => {
-                    if (loading) {
-                        loading.style.display = 'none';
-                    }
-                };
+                setupTelegramParamsForIframe(iframe);
 
                 // Скрываем главную кнопку для встроенного сервиса
                 tg.MainButton.hide();
+                tg.BackButton.show();
             }
 
             // Закрываем сайдбар на мобильных
@@ -376,6 +462,100 @@
             // Тактильная обратная связь
             tg.HapticFeedback.impactOccurred('light');
         }
+
+        // Слушаем сообщения от iframe (для обратной связи)
+        window.addEventListener('message', (event) => {
+            // Проверяем источник сообщения
+            if (event.origin !== 'https://quetlink-five.vercel.app') {
+                return;
+            }
+
+            const iframe = document.getElementById('gift-helper-iframe');
+            if (!iframe) return;
+
+            // Запрос данных от iframe
+            if (event.data && event.data.type === 'REQUEST_TELEGRAM_DATA') {
+                const telegramData = {
+                    initData: tg.initData,
+                    initDataUnsafe: tg.initDataUnsafe,
+                    version: tg.version,
+                    platform: tg.platform,
+                    colorScheme: tg.colorScheme,
+                    themeParams: tg.themeParams,
+                    isExpanded: tg.isExpanded,
+                    viewportHeight: tg.viewportHeight,
+                    viewportStableHeight: tg.viewportStableHeight,
+                    headerColor: tg.headerColor,
+                    backgroundColor: tg.backgroundColor,
+                    isClosingConfirmationEnabled: tg.isClosingConfirmationEnabled,
+                    BackButton: {
+                        isVisible: tg.BackButton.isVisible
+                    },
+                    MainButton: {
+                        text: tg.MainButton.text,
+                        color: tg.MainButton.color,
+                        textColor: tg.MainButton.textColor,
+                        isVisible: tg.MainButton.isVisible,
+                        isActive: tg.MainButton.isActive,
+                        isProgressVisible: tg.MainButton.isProgressVisible
+                    }
+                };
+
+                iframe.contentWindow.postMessage({
+                    type: 'TELEGRAM_WEB_APP_DATA',
+                    data: telegramData
+                }, 'https://quetlink-five.vercel.app');
+            }
+
+            // Обработка действий от iframe
+            if (event.data && event.data.type === 'TELEGRAM_MAIN_BUTTON_SHOW') {
+                tg.MainButton.show();
+            } else if (event.data && event.data.type === 'TELEGRAM_MAIN_BUTTON_HIDE') {
+                tg.MainButton.hide();
+            } else if (event.data && event.data.type === 'TELEGRAM_MAIN_BUTTON_SET_TEXT') {
+                tg.MainButton.setText(event.data.text);
+            } else if (event.data && event.data.type === 'TELEGRAM_MAIN_BUTTON_CLICKED') {
+                // Передаем клик в iframe
+                iframe.contentWindow.postMessage({
+                    type: 'TELEGRAM_MAIN_BUTTON_CLICKED'
+                }, 'https://quetlink-five.vercel.app');
+            } else if (event.data && event.data.type === 'TELEGRAM_BACK_BUTTON_CLICKED') {
+                // Передаем клик в iframe
+                iframe.contentWindow.postMessage({
+                    type: 'TELEGRAM_BACK_BUTTON_CLICKED'
+                }, 'https://quetlink-five.vercel.app');
+            } else if (event.data && event.data.type === 'TELEGRAM_CLOSE') {
+                tg.close();
+            } else if (event.data && event.data.type === 'TELEGRAM_EXPAND') {
+                tg.expand();
+            } else if (event.data && event.data.type === 'TELEGRAM_READY') {
+                tg.ready();
+            }
+        });
+
+        // Настраиваем главную кнопку для передачи кликов в iframe
+        tg.MainButton.onClick(() => {
+            const iframe = document.getElementById('gift-helper-iframe');
+            if (iframe && currentPage === 'gift-helper' && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    type: 'TELEGRAM_MAIN_BUTTON_CLICKED'
+                }, 'https://quetlink-five.vercel.app');
+            }
+        });
+
+        // Настраиваем кнопку "Назад" для передачи кликов в iframe
+        tg.BackButton.onClick(() => {
+            const iframe = document.getElementById('gift-helper-iframe');
+            if (iframe && currentPage === 'gift-helper' && iframe.contentWindow) {
+                iframe.contentWindow.postMessage({
+                    type: 'TELEGRAM_BACK_BUTTON_CLICKED'
+                }, 'https://quetlink-five.vercel.app');
+            } else if (currentPage !== 'wishlist') {
+                navigateTo('wishlist');
+            } else {
+                tg.close();
+            }
+        });
 
         // Переключение сайдбара на мобильных
         function toggleSidebar() {
@@ -402,16 +582,10 @@
         tg.BackButton.onClick(() => {
             if (currentPage !== 'wishlist') {
                 navigateTo('wishlist');
-                tg.BackButton.hide();
             } else {
                 tg.close();
             }
         });
-
-        // Показываем кнопку "Назад" только если не на главной странице
-        if (currentPage !== 'wishlist') {
-            tg.BackButton.show();
-        }
 
         // Обработка изменения ориентации на мобильных
         window.addEventListener('resize', () => {
@@ -423,17 +597,19 @@
             }
         });
 
-        // Инициализация iframe после загрузки
-        window.addEventListener('load', () => {
+        // Обновляем параметры при изменении темы
+        tg.onEvent('themeChanged', () => {
             const iframe = document.getElementById('gift-helper-iframe');
-            if (iframe) {
-                // Если iframe уже загружен, скрываем индикатор загрузки
-                setTimeout(() => {
-                    const loading = iframe.parentElement.querySelector('.iframe-loading');
-                    if (loading && iframe.contentDocument) {
-                        loading.style.display = 'none';
-                    }
-                }, 2000);
+            if (iframe && currentPage === 'gift-helper' && iframe.contentWindow) {
+                try {
+                    iframe.contentWindow.postMessage({
+                        type: 'TELEGRAM_THEME_CHANGED',
+                        colorScheme: tg.colorScheme,
+                        themeParams: tg.themeParams
+                    }, 'https://quetlink-five.vercel.app');
+                } catch (e) {
+                    console.error('Error sending theme update:', e);
+                }
             }
         });
     </script>
