@@ -1,15 +1,25 @@
 {
-  "name": "telegram-mini-app",
-  "version": "1.0.0",
-  "description": "Простой Telegram Mini App",
+  "name": "quetlink-test-miniapp",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "npx serve ."
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint ."
   },
-  "keywords": [
-    "telegram",
-    "mini-app",
-    "web-app"
-  ],
-  "author": "",
-  "license": "MIT"
+  "dependencies": {
+    "@telegram-apps/telegram-ui": "^2.1.13",
+    "@tma.js/sdk-react": "^3.0.11",
+    "next": "16.0.10",
+    "normalize.css": "^8.0.1",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5.9.3"
+  }
 }
