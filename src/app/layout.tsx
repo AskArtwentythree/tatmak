@@ -9,8 +9,8 @@ import "normalize.css/normalize.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Test Mini App - Quetlink Host",
-  description: "Тестовая мини-аппка для проверки открытия Quetlink",
+  title: "Тестовая Mini App - Quetlink SDK",
+  description: "Тестовая мини-аппка для проверки интеграции Quetlink SDK",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {

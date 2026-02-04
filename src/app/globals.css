@@ -12,17 +12,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.app-container {
-  padding: 20px;
-  max-width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-}
-
 .app-title {
   font-size: 24px;
   font-weight: 600;
@@ -78,4 +67,45 @@ body {
   font-size: 12px;
   color: #666;
   line-height: 1.5;
+}
+
+.app-root {
+  display: flex;
+  min-height: 100vh;
+  background: #f3f4f6;
+  color: #111827;
+  font-size: 14px;
+}
+
+.sidebar {
+  width: 220px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.sidebar-item--active {
+  background: #0088cc;
+  color: #ffffff;
+}
+
+.content {
+  flex: 1;
+  padding: 16px;
+  overflow: auto;
 }
