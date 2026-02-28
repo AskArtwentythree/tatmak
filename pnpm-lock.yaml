@@ -21,8 +21,8 @@ importers:
         specifier: ^19
         version: 19.2.4(react@19.2.4)
       telegram-gifts-sdk:
-        specifier: ^0.6.3
-        version: 0.6.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        specifier: ^0.6.4
+        version: 0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
     devDependencies:
       '@tailwindcss/postcss':
         specifier: ^4.1.18
@@ -551,8 +551,8 @@ packages:
     resolution: {integrity: sha512-g9ljZiwki/LfxmQADO3dEY1CbpmXT5Hm2fJ+QaGKwSXUylMybePR7/67YW7jOrrvjEgL1Fmz5kzyAjWVWLlucg==}
     engines: {node: '>=6'}
 
-  telegram-gifts-sdk@0.6.3:
-    resolution: {integrity: sha512-qiifbC9TDQReDsH9Ubi3QZSRldJ07oEaE2Pln4DQOmB9dS23WAEMzbRNTxGG45/quvM1QH+UE6/WxwA2Y9yHFQ==}
+  telegram-gifts-sdk@0.6.4:
+    resolution: {integrity: sha512-emvriZ2OJ9UJ8HtsYcH4eX+J7BAvtxO7GwkZ8GDp/AuVPK0jKmmqZbrpm8QebPiLOzWbba+T3ZDLHp1hAou2GA==}
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
@@ -973,7 +973,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  telegram-gifts-sdk@0.6.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
+  telegram-gifts-sdk@0.6.4(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
