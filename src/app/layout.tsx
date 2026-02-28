@@ -4,7 +4,6 @@ import Script from "next/script";
 
 import { Root } from "@/components/Root";
 
-import "@telegram-apps/telegram-ui/dist/styles.css";
 import "normalize.css/normalize.css";
 import "./globals.css";
 
