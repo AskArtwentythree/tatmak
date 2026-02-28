@@ -1,6 +1,6 @@
 # White-Label интеграция Quetlink
 
-## Как это работает
+## Как это работает asd
 
 ### Вариант A: Рекомендуемый — через Telegram Web App кнопку
 
@@ -9,19 +9,16 @@
 1. **Host (сторонняя мини-аппка)** добавляет в свой UI кнопку, которая вызывает `web_app` (InlineKeyboardButton / menu button) с URL на вашу мини-аппку Quetlink.
 
 2. При открытии Telegram вставит в WebView подписанные параметры:
-
    - `tgWebAppData` / `initData` — подписанные данные пользователя
    - `query_id` — уникальный идентификатор сессии
    - `user` — данные пользователя Telegram
 
 3. **На фронте Quetlink:**
-
    - Получаете `window.Telegram.WebApp.initData` (и/или `initDataUnsafe`)
    - **НЕ доверяете** `initData` на клиенте
    - Отправляете её на ваш бэкенд
 
 4. **На бэкенде Quetlink:**
-
    - Валидируете подпись (HMAC-SHA256)
    - Получаете `user.id`, `auth_date` и т.д.
    - Создаёте/настраиваете сессию (JWT) и возвращаете безопасный сессионный токен фронту
@@ -328,7 +325,6 @@ https://quetlink-mfkh.vercel.app?host_id=123
    ```
 
 2. **Настройте тестового бота:**
-
    - Создайте бота через @BotFather (test server)
    - Настройте Mini App URL (используйте ngrok/tunnel для локального тестирования)
 
